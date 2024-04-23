@@ -1,11 +1,18 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.timezone import now
 
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+
+
+#IMPORT MODELS AND SERIALIZERS
+from .models import User, Category, UAV, Rental
+from . serializers import (UserSerializer, CategorySerializer, UAVSerializer, RentalSerializer)
 
 
 # SESSION BASED AUTHENTICATION VIEWS - LOGIN AND LOGOUT USER
@@ -53,3 +60,56 @@ def logout_view(request):
 
     logout(request)
     return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+
+#MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE CATEGORIES
+class CategoryViewSet(ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+#MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE UAV'S
+class UAVViewSet(ModelViewSet):
+    queryset = UAV.objects.all()
+    serializer_class = UAVSerializer
+    permission_classes = [IsAuthenticated]
+    
+    
+#MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE RENTALS
+class RentalViewSet(ModelViewSet):
+    queryset = Rental.objects.all()
+    serializer_class = RentalSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def create(self, request):
+        rental_data = {'uav_id': request.data['uav_id'][0], 'user_id': request.user.id}
+        serialized_rental = RentalSerializer(data=rental_data)
+        serialized_rental.is_valid(raise_exception=True)
+        serialized_rental.save()
+        return Response(serialized_rental.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, pk):
+        rental = get_object_or_404(Rental, id=pk)
+        if rental.user.id == request.user.id:
+            serialized_rental = RentalSerializer(rental, request.data, partial=True)
+            serialized_rental.is_valid(raise_exception=True)
+            self.perform_update(serialized_rental)
+            return Response(serialized_rental.data, status=status.HTTP_200_OK)
+        else:
+             return Response(
+                {"detail": "You do not have permission to do this action."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+    
+    def destroy(self,request,pk):
+        rental = get_object_or_404(Rental, id=pk)
+        if rental.user.id == request.user.id:
+            self.perform_destroy(rental)
+            return Response(
+                {'detail': 'Rental successfully deleted.'}, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"detail": "You do not have permission to do this action."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+            

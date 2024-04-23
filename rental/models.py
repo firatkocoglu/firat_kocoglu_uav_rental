@@ -15,7 +15,10 @@ class UAV(models.Model):
     brand = models.CharField(max_length=255)
     model = models.CharField(max_length=255)
     weight = models.IntegerField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    altitude = models.DecimalField(max_digits=6, decimal_places=0)
+    height = models.DecimalField(max_digits=3, decimal_places=1)
+    length = models.DecimalField(max_digits=3, decimal_places=1)
+    payload_capacity = models.IntegerField()
     
     def __str__(self):
         return self.brand + ' ' + self.title
@@ -26,7 +29,6 @@ class Rental(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     uav = models.ForeignKey(UAV, on_delete=models.PROTECT)
     date = models.DateTimeField(default=now)
-    total = models.DecimalField(max_digits=8, decimal_places=2)
     
     def __str__(self):
         return self.user + ' ' + self.uav

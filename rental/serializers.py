@@ -19,7 +19,7 @@ class UAVSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UAV
-        fields = ['id', 'category_id', 'category', 'brand', 'model', 'weight', 'price']
+        fields = ['id', 'category_id', 'category', 'brand', 'model', 'weight', 'altitude', 'height', 'length', 'payload_capacity']
 
 class RentalSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -30,4 +30,4 @@ class RentalSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Rental
-        fields = ['id', 'user_id', 'user', 'uav_id', 'uav', 'date', 'total']
+        fields = ['id', 'user_id', 'user', 'uav_id', 'uav', 'date']
