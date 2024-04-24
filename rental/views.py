@@ -1,18 +1,19 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils.timezone import now
 
-from rest_framework import status
+from rest_framework import status, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 #IMPORT MODELS AND SERIALIZERS
-from .models import User, Category, UAV, Rental
-from . serializers import (UserSerializer, CategorySerializer, UAVSerializer, RentalSerializer)
+from .models import Category, UAV, Rental
+from . serializers import (CategorySerializer, UAVSerializer, RentalSerializer)
 
 
 # SESSION BASED AUTHENTICATION VIEWS - LOGIN AND LOGOUT USER
@@ -65,20 +66,41 @@ def logout_view(request):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    filterset_fields = ['category']
+    search_fields = ['category']
 
 #MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE UAV'S
 class UAVViewSet(ModelViewSet):
     queryset = UAV.objects.all()
     serializer_class = UAVSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    )
+    
+    filterset_fields = ['category__id', 'brand', 'model']
+    search_fields = (
+        'category__category',
+        'brand',
+        'model',
+    )
     
     
 #MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE RENTALS
 class RentalViewSet(ModelViewSet):
     queryset = Rental.objects.all()
     serializer_class = RentalSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    )
+    
+    filterset_fields = ['uav__id', 'user__id', 'date', 'user__first_name', 'user__last_name']
+    search_fields = ('uav__brand', 'uav__model', 'user__first_name', 'user__last_name')
     
     def create(self, request):
         rental_data = {'uav_id': request.data['uav_id'][0], 'user_id': request.user.id}
