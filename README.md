@@ -11,19 +11,35 @@ Djoser is used to implement authentication operations. Session Based Authenticat
 Register
 
 ```
-'http://127.0.0.1:8000/auth/users/'
+http://127.0.0.1:8000/auth/users/
 ```
 
 Login
 
 ```
-'http://127.0.0.1:8000/api/login/'
+http://127.0.0.1:8000/api/login/
 ```
 
 Logout
 
 ```
-'http://127.0.0.1:8000/api/logout/'
+http://127.0.0.1:8000/api/logout/
 ```
 
 ### UAV Operations
+
+Users can list, update and delete existing UAV's and create new UAV's.
+
+To list and create UAV's relevant requests should be sent to the endpoint below:
+
+```
+http://127.0.0.1:8000/api/uav/
+```
+
+To update and delete existing UAV's users should send requests to the endpoint below:
+
+```
+http://127.0.0.1:8000/api/uav/uav_id/
+```
+
+All the CRUD operations for UAV endpoints requires authentication.
