@@ -66,16 +66,16 @@ def logout_view(request):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filterset_fields = ['category']
     search_fields = ['category']
 
 #MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE UAV'S
 class UAVViewSet(ModelViewSet):
-    queryset = UAV.objects.all()
+    queryset = UAV.objects.order_by('id')
     serializer_class = UAVSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     filter_backends = (
         DjangoFilterBackend,
         filters.SearchFilter,
@@ -91,19 +91,20 @@ class UAVViewSet(ModelViewSet):
     
 #MODEL VIEWSET TO LIST, ADD, UPDATE AND DELETE RENTALS
 class RentalViewSet(ModelViewSet):
-    queryset = Rental.objects.all()
+    queryset = Rental.objects.order_by('id')
     serializer_class = RentalSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     filter_backends = (
         DjangoFilterBackend,
         filters.SearchFilter,
     )
     
-    filterset_fields = ['uav__id', 'user__id', 'date', 'user__first_name', 'user__last_name']
-    search_fields = ('uav__brand', 'uav__model', 'user__first_name', 'user__last_name')
+    filterset_fields = ['uav__model', 'user__username']
+    search_fields = ('uav__brand', 'uav__model', 'user__username')
     
     def create(self, request):
-        rental_data = {'uav_id': request.data['uav_id'][0], 'user_id': request.user.id}
+        ##WE OBTAIN UAV ID FROM USER AND USER INFO FROM CSRF TOKEN SENT BY BROWSER
+        rental_data = {'uav_id': request.data['uav_id'], 'user_id': request.user.id}
         serialized_rental = RentalSerializer(data=rental_data)
         serialized_rental.is_valid(raise_exception=True)
         serialized_rental.save()
@@ -111,19 +112,23 @@ class RentalViewSet(ModelViewSet):
     
     def update(self, request, pk):
         rental = get_object_or_404(Rental, id=pk)
+        
+        ##WE ONLY WANT USERS TO UPDATE THEIR OWN RENTALS 
         if rental.user.id == request.user.id:
             serialized_rental = RentalSerializer(rental, request.data, partial=True)
             serialized_rental.is_valid(raise_exception=True)
             self.perform_update(serialized_rental)
             return Response(serialized_rental.data, status=status.HTTP_200_OK)
-        else:
+        else: 
              return Response(
                 {"detail": "You do not have permission to do this action."},
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_403_FORBIDDEN
             )
     
     def destroy(self,request,pk):
         rental = get_object_or_404(Rental, id=pk)
+        
+        ##WE ONLY WANT USERS TO DELETE THEIR OWN RENTALS
         if rental.user.id == request.user.id:
             self.perform_destroy(rental)
             return Response(
