@@ -4,6 +4,8 @@
 
 ## Django and Django Rest Framework are used for back-end and React is used for front-end in this project.
 
+## PostgreSQL is used in database layer.
+
 ### Authentication
 
 Djoser is used to implement authentication operations. Session Based Authentication provided by Django is the default authentication method in this project. Authentication endpoints are listed below:
@@ -89,3 +91,7 @@ http://127.0.0.1:8000/api/rentals/?search=${searchQuery}
 ```
 http://127.0.0.1:8000/api/uav/?search=${searchQuery}
 ```
+
+## React Front-End
+
+The client application is built with React. To create a consistent style, all the components are created with React Bootstrap 5 Components. React Router is used to navigate between components. The client application build is served by Django. Axios is used to send request from client application to Django server. Datatables are created to list UAV and rental data provided by Django server.
