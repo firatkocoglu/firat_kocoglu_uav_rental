@@ -43,3 +43,49 @@ http://127.0.0.1:8000/api/uav/uav_id/
 ```
 
 All the CRUD operations for UAV endpoints requires authentication.
+
+### Rentals Operations
+
+Users can list, update and delete existing rentals and create new rentals as well.
+
+To list and create rentals relevant requests should be sent to the endpoint below:
+
+```
+http://127.0.0.1:8000/api/rentals/
+```
+
+To update and delete existing rentals users should send requests to the endpoint below:
+
+```
+http://127.0.0.1:8000/api/rentals/rental_id/
+```
+
+All the CRUD operations for rental endpoints requires authentication.
+
+### Filter and search
+
+UAV listings can be filtered by category, brand and model of UAV's.
+
+Rental listings can be filtered by UAV model and member username.
+
+Users can filter all the listings with sending request to server as follows:
+
+```
+http://127.0.0.1:8000/api/rentals/?uav__model=${uavModelFilter}&user__username=${userFilter}
+```
+
+or
+
+```
+http://127.0.0.1:8000/api/uav/?category__id=${categoryFilter}&brand=${brandFilter}&model=${modelFilter}
+```
+
+Users also can search both listings as follows:
+
+```
+http://127.0.0.1:8000/api/rentals/?search=${searchQuery}
+```
+
+```
+http://127.0.0.1:8000/api/uav/?search=${searchQuery}
+```
