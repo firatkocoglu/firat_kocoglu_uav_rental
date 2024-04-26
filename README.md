@@ -1,7 +1,5 @@
 # firat_kocoglu_uav_rental
 
-## This project is built by Fırat Koçoğlu as requested by Baykar Technologies as a part of technical evaluation process of Back End Developer Position.
-
 ## Django and Django Rest Framework are used for back-end and React is used for front-end in this project.
 
 ## PostgreSQL is used in database layer.
